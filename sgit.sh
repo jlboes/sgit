@@ -27,8 +27,8 @@ BACKGREEN="\\033[0;42m"
 
 function confirm(){
 	# call with a prompt string or use a default
-	read -r -p "${1:-yes / no ? [y/N]}" anwser
-	case $anwser in
+	read -r -p "${1:-yes / no ? [y/N]}" answer
+	case $answer in
             [yY][eE][sS]|[yY]) 
                 true
             ;;
