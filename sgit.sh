@@ -50,14 +50,14 @@ if [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote
 else
 	echo -e "Repository is ""$ROUGE""not""$NORMAL"" up to date"
 	echo "Checking if pull is possible"
-	if [ "`git st --porcelain -u no | wc -l`" -gt "1" ]; then
+	if [ "`git st --porcelain -uno | wc -l`" -gt "1" ]; then
 		echo "Unstaged file => cannot pull changes"
 		#display files
 		 git st --porcelain | grep M | cut -d " " -f3 | while read param
 		 do
 		         echo -n $param
 	        	 fileEncoding=`file -bi $param | cut -d "=" -f2`
-	        	 if [ "$fileEncoding" = "utf-8" ]; then
+	        	 if [ "$fileEncoding" = "utf-8" ] || [ "$fileEncoding" = "us-ascii" ]; then
         		         echo -e "$VERT" " ::  $fileEncoding" "$NORMAL"
 		         else
 	        	         echo -e "$ROUGE" " ::  $fileEncoding" "$NORMAL"
