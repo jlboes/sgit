@@ -14,6 +14,7 @@ BACKGREEN="\\033[0;42m"
 
 # @todo Error management
 # @todo use function read commit message sur plusieurs ligne?
+# @todo check if current version is uptodate
 
 # @niceToHave : check for codingStandard 
 
@@ -39,7 +40,16 @@ function confirm(){
 }
 
 
+# git log as tree with date - comment - commiter name
+function gLog(){
+	git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all | head
+}
 
+# Fetch remote changes and display tree log
+function displayFetchTreeLog(){
+	git fetch
+	gLog
+}
 
 
 
@@ -49,9 +59,10 @@ if [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote
 	git st
 else
 	echo -e "Repository is ""$ROUGE""not""$NORMAL"" up to date"
+	displayFetchTreeLog
 	echo "Checking if pull is possible"
 	if [ "`git st --porcelain -uno | wc -l`" -gt "1" ]; then
-		echo "Unstaged file => cannot pull changes"
+		echo -e "Unstaged file =>  ""$ROUGE""cannot""$NORMAL"" pull changes"
 		#display files
 		 git st --porcelain | grep M | cut -d " " -f3 | while read param
 		 do
