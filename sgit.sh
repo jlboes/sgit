@@ -64,7 +64,7 @@ else
 	if [ "`git st --porcelain -uno | wc -l`" -gt "1" ]; then
 		echo -e "Unstaged file =>  ""$ROUGE""cannot""$NORMAL"" pull changes"
 		#display files
-		 git st --porcelain | grep M | cut -d " " -f3 | while read param
+		 git st --porcelain |  grep -v ?? | cut -d " " -f2,3 | while read param
 		 do
 		         echo -n $param
 	        	 fileEncoding=`file -bi $param | cut -d "=" -f2`
