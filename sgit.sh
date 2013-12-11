@@ -14,7 +14,7 @@ BACKGREEN="\\033[0;42m"
 
 # @todo Error management
 # @todo use function read commit message sur plusieurs ligne?
-# @todo check if current version is uptodate
+# @todo check if current version is uptodate :: option in config file
 
 # @niceToHave : check for codingStandard 
 
@@ -51,12 +51,51 @@ function displayFetchTreeLog(){
 	gLog
 }
 
+function statusFiles(){
+	#echo  'git st --porcelain |  egrep """$1"""  | cut -d " " -f$2'
+	git st --porcelain |  egrep """$1"""  | cut -d " " -f$2 | while read param
+        do
+            echo -n $param
+            fileEncoding=`file -bi $param | cut -d "=" -f2`
+            if [ "$fileEncoding" = "utf-8" ] || [ "$fileEncoding" = "us-ascii" ]; then
+                echo -e "$VERT" " ::  $fileEncoding" "$NORMAL"
+            else
+                echo -e "$ROUGE" " ::  $fileEncoding" "$NORMAL"
+            fi
+
+         done
+
+}
+
+function getStagedFiles(){
+	if [ "`git st --porcelain |  egrep -c '^[A-Z]{1,2} '`" -gt "0" ]; then
+		regex="^[A-Z]{1} "
+		statusFiles "$regex" 3
+		
+		regex="^[A-Z]{2} "
+		statusFiles "$regex" 2
+		return 1
+	else
+		return 0
+	fi
+}
+
+function getUnstagedFiles(){
+  	regex="^ [A-Z]{1} "
+	if [ "`git st --porcelain |  egrep -c """$regex"""`" -gt "0" ]; then
+	    statusFiles "$regex" 3
+	else
+	    return 0
+	fi
+}
+
+#@todo Display working branch
 
 
 if [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
-	git st
+	
 else
 	echo -e "Repository is ""$ROUGE""not""$NORMAL"" up to date"
 	displayFetchTreeLog
@@ -64,22 +103,17 @@ else
 	if [ "`git st --porcelain -uno | wc -l`" -gt "1" ]; then
 		echo -e "Unstaged file =>  ""$ROUGE""cannot""$NORMAL"" pull changes"
 		#display files
-		 git st --porcelain |  grep -v ?? | cut -d " " -f2,3 | while read param
-		 do
-		         echo -n $param
-	        	 fileEncoding=`file -bi $param | cut -d "=" -f2`
-	        	 if [ "$fileEncoding" = "utf-8" ] || [ "$fileEncoding" = "us-ascii" ]; then
-        		         echo -e "$VERT" " ::  $fileEncoding" "$NORMAL"
-		         else
-	        	         echo -e "$ROUGE" " ::  $fileEncoding" "$NORMAL"
-        		 fi
-	
-		 done
+		getStagedFiles	
+		
+		getUnstagedFiles
+
+
+		# ask to prop the files in order to pull?
 
 	else
 		echo "OK for pull"
 		# display git lg
-		confirm "Would you like to do a pull? [y/N] " && git pull --rebase && git log --oneline --abbrev-commit --all --graph --decorate --color
+		confirm "Would you like to do a pull? [y/N] " && git pull --rebase && git log --oneline --abbrev-commit --all --graph --decorate --color | head
 		#git commit
 	fi
 fi
