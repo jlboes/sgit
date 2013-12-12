@@ -16,6 +16,8 @@ BACKGREEN="\\033[0;42m"
 # @todo use function read commit message sur plusieurs ligne?
 # @todo check if current version is uptodate :: option in config file
 
+#todo display changess to be committed
+
 # @niceToHave : check for codingStandard 
 
 
@@ -89,9 +91,21 @@ function getUnstagedFiles(){
 	fi
 }
 
-#@todo Display working branch
+#Display working branch
+function displayWorkingBranch(){
+	branch=`git branch | grep \* | cut -d " " -f2 | tr  '[:lower:]' '[:upper:]'`
+	if [ "$branch" = "MASTER" ]; then
+		color=$VERT
+	else
+		color="$ROUGE"
+	fi
+
+	echo -e "You are working in branch :  $color" "$branch" "$NORMAL"
+}
 
 
+
+displayWorkingBranch
 if [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
