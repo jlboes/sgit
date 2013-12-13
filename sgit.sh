@@ -91,6 +91,27 @@ function getUnstagedFiles(){
 	fi
 }
 
+
+function displayRepositoryChanges(){
+	echo ""
+	stagedFiles=`getStagedFiles`
+	exitStatusFunc1=$?
+	unstagedFiles=`getUnstagedFiles`
+	exitStatusFunc2=$?
+
+	if [ $exitStatusFunc1 -eq 0 -o $exitStatusFunc2 -eq 0 ]; then
+		echo "Your local changes : "
+		if [ $exitStatusFunc1 -eq 0 ];then
+			echo $stagedFiles
+		fi
+		if [ $exitStatusFunc2 -eq 0 ];then
+			echo $unstagedFiles
+		fi
+	else
+		echo "No local changes"
+	fi
+}
+
 #Display working branch
 function displayWorkingBranch(){
 	branch=`git branch | grep \* | cut -d " " -f2 | tr  '[:lower:]' '[:upper:]'`
@@ -109,6 +130,7 @@ displayWorkingBranch
 if [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
+	displayRepositoryChanges
 	
 else
 	echo -e "Repository is ""$ROUGE""not""$NORMAL"" up to date"
@@ -117,17 +139,14 @@ else
 	if [ "`git st --porcelain -uno | wc -l`" -gt "1" ]; then
 		echo -e "Unstaged file =>  ""$ROUGE""cannot""$NORMAL"" pull changes"
 		#display files
-		getStagedFiles	
-		
-		getUnstagedFiles
-
+		displayRepositoryChanges
 
 		# ask to prop the files in order to pull?
 
 	else
 		echo "OK for pull"
 		# display git lg
-		confirm "Would you like to do a pull? [y/N] " && git pull --rebase && git log --oneline --abbrev-commit --all --graph --decorate --color | head
+		confirm "Would you like to do a pull? [y/N] " && git pull --rebase && displayFetchTreeLog
 		#git commit
 	fi
 fi
