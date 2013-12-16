@@ -54,7 +54,7 @@ function displayFetchTreeLog(){
 }
 
 function statusFiles(){
-	#echo  'git st --porcelain |  egrep """$1"""  | cut -d " " -f$2'
+	# echo  "git st --porcelain |  egrep """$1"""  | cut -d \" \" -f$2"
 	git st --porcelain |  egrep """$1"""  | cut -d " " -f$2 | while read param
         do
             echo -n $param
@@ -71,23 +71,26 @@ function statusFiles(){
 
 function getStagedFiles(){
 	if [ "`git st --porcelain |  egrep -c '^[A-Z]{1,2} '`" -gt "0" ]; then
+		echo -e "Staged Files\n"
 		regex="^[A-Z]{1} "
 		statusFiles "$regex" 3
 		
 		regex="^[A-Z]{2} "
 		statusFiles "$regex" 2
-		return 1
-	else
 		return 0
+	else
+		return 1 
 	fi
 }
 
 function getUnstagedFiles(){
   	regex="^ [A-Z]{1} "
 	if [ "`git st --porcelain |  egrep -c """$regex"""`" -gt "0" ]; then
+	    echo -e "Unstaged Files\n"
 	    statusFiles "$regex" 3
-	else
 	    return 0
+	else
+	    return 1
 	fi
 }
 
@@ -102,13 +105,13 @@ function displayRepositoryChanges(){
 	if [ $exitStatusFunc1 -eq 0 -o $exitStatusFunc2 -eq 0 ]; then
 		echo "Your local changes : "
 		if [ $exitStatusFunc1 -eq 0 ];then
-			echo $stagedFiles
+			echo -e $stagedFiles
 		fi
 		if [ $exitStatusFunc2 -eq 0 ];then
-			echo $unstagedFiles
+			echo -e $unstagedFiles
 		fi
 	else
-		echo "No local changes"
+		echo "**No local changes**"
 	fi
 }
 
@@ -136,7 +139,7 @@ else
 	echo -e "Repository is ""$ROUGE""not""$NORMAL"" up to date"
 	displayFetchTreeLog
 	echo "Checking if pull is possible"
-	if [ "`git st --porcelain -uno | wc -l`" -gt "1" ]; then
+	if [ `git st --porcelain -uno | wc -l` -gt 0 ]; then
 		echo -e "Unstaged file =>  ""$ROUGE""cannot""$NORMAL"" pull changes"
 		#display files
 		displayRepositoryChanges
