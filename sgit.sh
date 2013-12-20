@@ -45,7 +45,11 @@ function confirm(){
 # git log as tree with date - comment - commiter name
 function gLog(){
     username=`git config user.name`
-	git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all | sed /"$username"/q
+	usernameLog=`git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all | sed /"$username"/q`
+
+    branches=`git show-branch --list | sed -nr 's/^[\* ]*\[([a-zA-Z]*)\].*$/\1/p'`
+
+    printf "%b\n" "$usernameLog"
 }
 
 # Fetch remote changes and display tree log
