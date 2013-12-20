@@ -44,12 +44,13 @@ function confirm(){
 
 # git log as tree with date - comment - commiter name
 function gLog(){
-	git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all | head
+    username=`git config user.name`
+	git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all | sed /"$username"/q
 }
 
 # Fetch remote changes and display tree log
 function displayFetchTreeLog(){
-	git fetch
+	git fetch > /dev/null
 	gLog
 }
 
@@ -57,10 +58,12 @@ function statusFiles(){
 	# echo  "git st --porcelain |  egrep """$1"""  | cut -d \" \" -f$2"
 	git st --porcelain |  egrep """$1"""  | cut -d " " -f$2 | while read param
         do
-            echo -n $param
+            line=$param
             fileEncoding=`file -bi $param | cut -d "=" -f2`
             if [ "$fileEncoding" = "utf-8" ] || [ "$fileEncoding" = "us-ascii" ]; then
-                echo -e "$VERT" " ::  $fileEncoding" "$NORMAL"
+                status="$VERT"" ::  $fileEncoding""$NORMAL"
+                linefull=$line$status
+                printf "%b\n" "$linefull"
             else
                 echo -e "$ROUGE" " ::  $fileEncoding" "$NORMAL"
             fi
@@ -86,7 +89,7 @@ function getStagedFiles(){
 function getUnstagedFiles(){
   	regex="^ [A-Z]{1} "
 	if [ "`git st --porcelain |  egrep -c """$regex"""`" -gt "0" ]; then
-	    echo -e "Unstaged Files\n"
+	    printf "%b\n" "Unstaged Files\n"
 	    statusFiles "$regex" 3
 	    return 0
 	else
@@ -96,7 +99,6 @@ function getUnstagedFiles(){
 
 
 function displayRepositoryChanges(){
-	echo ""
 	stagedFiles=`getStagedFiles`
 	exitStatusFunc1=$?
 	unstagedFiles=`getUnstagedFiles`
@@ -108,7 +110,7 @@ function displayRepositoryChanges(){
 			echo -e $stagedFiles
 		fi
 		if [ $exitStatusFunc2 -eq 0 ];then
-			echo -e $unstagedFiles
+			printf "%b\n" "$unstagedFiles"
 		fi
 	else
 		echo "**No local changes**"
