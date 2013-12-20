@@ -121,10 +121,15 @@ function displayRepositoryChanges(){
 	fi
 }
 
+function getCurrentBranch(){
+    branch=`git branch | grep \* | cut -d " " -f2`
+    printf "%b\n" "$branch"
+}
+
 #Display working branch
 function displayWorkingBranch(){
-	branch=`git branch | grep \* | cut -d " " -f2 | tr  '[:lower:]' '[:upper:]'`
-	if [ "$branch" = "MASTER" ]; then
+    branch=`echo "$1"| tr  '[:lower:]' '[:upper:]'`
+	if [ $branch = "MASTER" ]; then
 		color=$VERT
 	else
 		color="$ROUGE"
@@ -134,9 +139,10 @@ function displayWorkingBranch(){
 }
 
 
-
-displayWorkingBranch
-if [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]; then
+branch=`getCurrentBranch`
+echo $branch
+displayWorkingBranch $branch
+if [ "`git log --pretty=%H ...refs/heads/dev^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
 	displayRepositoryChanges
