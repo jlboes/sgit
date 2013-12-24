@@ -13,14 +13,17 @@ BACKGREEN="\\033[0;42m"
 # Display Warn message + ask confirm before commit
 
 # @todo Error management
-# @todo use function read commit message sur plusieurs ligne?
+# @todo use function read commit multi line?
 # @todo check if current version is uptodate :: option in config file
+# @todo check if any log message
 
 #todo display changess to be committed
 
 # @niceToHave : check for codingStandard 
 
 
+# INFO :
+# ---------------
 # File encoding
 #US-ASCII -- is -- a subset of UTF-8 (see Ned's answer below)
 #Meaning that US-ASCII files are actually encoded in UTF-8
@@ -128,13 +131,15 @@ function getCurrentBranch(){
 
 #Display working branch
 function displayWorkingBranch(){
-    branch=`echo "$1"| tr  '[:lower:]' '[:upper:]'`
-	if [ $branch = "MASTER" ]; then
-		color=$VERT
+    local branch=$1
+    local pattern="^prod.*|^int.*"
+	if [[ "$branch" =~ ($pattern) ]]; then
+		color=$ROUGE
 	else
-		color="$ROUGE"
+		color="$VERT"
 	fi
 
+    branch=`echo "$branch"| tr  '[:lower:]' '[:upper:]'`
 	echo -e "You are working in branch :  $color" "$branch" "$NORMAL"
 }
 
@@ -142,7 +147,7 @@ function displayWorkingBranch(){
 branch=`getCurrentBranch`
 echo $branch
 displayWorkingBranch $branch
-if [ "`git log --pretty=%H ...refs/heads/dev^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]; then
+if [ "`git log --pretty=%H ...refs/heads/$branch^ | head -n 1`" = "`git ls-remote origin -h refs/heads/$branch |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
 	displayRepositoryChanges
