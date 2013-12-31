@@ -17,7 +17,7 @@ BACKGREEN="\\033[0;42m"
 # @todo check if current version is uptodate :: option in config file
 # @todo check if any log message
 
-#todo display changess to be committed
+#todo display changes to be committed
 
 # @niceToHave : check for codingStandard 
 
@@ -143,10 +143,20 @@ function displayWorkingBranch(){
 	echo -e "You are working in branch :  $color" "$branch" "$NORMAL"
 }
 
+function stashAndPull(){
+    confirm "Would you like to stash your current work and do a pull? [y/N] " && confirm "Please confirm one more time [y/N] "
+    if [ $? -eq 0 ]; then
+        git stash > /dev/null && "Current work is now stagged"
+        git pull --rebase > /dev/null && "Pull successful" && displayFetchTreeLog
+        git stash pop
+        displayRepositoryChanges
+    fi
+}
+
 
 branch=`getCurrentBranch`
-echo $branch
 displayWorkingBranch $branch
+echo $branch
 if [ "`git log --pretty=%H ...refs/heads/$branch^ | head -n 1`" = "`git ls-remote origin -h refs/heads/$branch |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
@@ -162,6 +172,7 @@ else
 		displayRepositoryChanges
 
 		# ask to prop the files in order to pull?
+        stashAndPull
 
 	else
 		echo "OK for pull"
