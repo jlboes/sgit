@@ -57,7 +57,7 @@ function gLog(){
 
 # Fetch remote changes and display tree log
 function displayFetchTreeLog(){
-	git fetch > /dev/null
+	sg_exec "git fetch > /dev/null"
 	gLog
 }
 
@@ -146,13 +146,17 @@ function displayWorkingBranch(){
 function stashAndPull(){
     confirm "Would you like to stash your current work and do a pull? [y/N] " && confirm "Please confirm one more time [y/N] "
     if [ $? -eq 0 ]; then
-        git stash > /dev/null && "Current work is now stagged"
-        git pull --rebase > /dev/null && "Pull successful" && displayFetchTreeLog
-        git stash pop
+        sg_exec "git stash > /dev/null" && echo "Current work is now stagged"
+        sg_exec "git pull --rebase > /dev/null" && echo "Pull successful" && displayFetchTreeLog
+        sg_exec "git stash pop"
         displayRepositoryChanges
     fi
 }
 
+function sg_exec(){
+    echo "command : " $1
+    eval $1
+}
 
 branch=`getCurrentBranch`
 displayWorkingBranch $branch
