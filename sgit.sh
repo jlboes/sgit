@@ -153,6 +153,7 @@ function stashAndPull(){
     fi
 }
 
+# Echo and exec a command
 function sg_exec(){
     echo "command : " $1
     eval $1
@@ -160,7 +161,7 @@ function sg_exec(){
 
 branch=`getCurrentBranch`
 displayWorkingBranch $branch
-echo $branch
+
 if [ "`git log --pretty=%H ...refs/heads/$branch^ | head -n 1`" = "`git ls-remote origin -h refs/heads/$branch |cut -f1`" ]; then
 
 	echo -e "Repository is up to date... ""$BACKGREEN"" ""$NORMAL" 
@@ -181,7 +182,7 @@ else
 	else
 		echo "OK for pull"
 		# display git lg
-		confirm "Would you like to do a pull? [y/N] " && git pull --rebase && displayFetchTreeLog
+		confirm "Would you like to do a pull? [y/N] " && sg_exec "git pull --rebase" && displayFetchTreeLog
 		#git commit
 	fi
 fi
