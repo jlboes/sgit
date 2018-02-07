@@ -7,15 +7,20 @@ function merge()
     branchToReturn=$(getCurrentBranch)
     branch=$1 && \
     git checkout "${branch}"
+    if [ $? -ne 0 ]; then
+        sg_warn_echo  "repository is not clear for checkout"
+        return -1
+    fi
+
     if [ checkIfPullPossible ]; then
         pull  && \
         git checkout "${branchToReturn}"  && \
         git merge --no-ff --no-edit ${branch}
         return 0
-        else
-        sg_warn_echo  "repository is not clear for pull"
-        git checkout "${branchToReturn}"
     fi
+
+    git checkout "${branchToReturn}"
+    sg_warn_echo  "repository is not clear for pull"
     return -1
 }
 

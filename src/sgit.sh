@@ -149,7 +149,7 @@ function stashAndPull(){
 
 # Echo and exec a command
 function sg_exec(){
-    echo " > command : " $1
+    sg_info_echo "command : " $1
     eval $1
 #    "$($1)"
 }

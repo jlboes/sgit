@@ -16,7 +16,7 @@ if [ $# -gt 0 ]; then
     shift
     cmd_args="'$*'"
     validate_args ${cmd} ${_valid_cmd[@]}
-    echo " > $cmd ${cmd_args}"
+    sg_echo "$cmd ${cmd_args}"
     eval "$cmd ${cmd_args}"
 
 elif [ "`git log --pretty=%H ...refs/heads/$branch^ | head -n 1`" = "`git ls-remote origin -h refs/heads/$branch |cut -f1`" ]; then

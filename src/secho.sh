@@ -14,6 +14,17 @@ function sg_echo(){
 }
 
 
+function sg_debug_echo(){
+    msg="$*"
+    echo -e "$BLUE" " > $msg" "$NORMAL"
+}
+
+
+function sg_info_echo(){
+    msg="$*"
+    echo -e "$GREEN" " > $msg" "$NORMAL"
+}
+
 function sg_warn_echo(){
     msg="$*"
     echo -e "$RED" " >> $msg" "$NORMAL"
