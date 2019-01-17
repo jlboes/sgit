@@ -12,7 +12,7 @@ function merge()
         return -1
     fi
 
-    if [ checkIfPullPossible ]; then
+    if [[ checkIfPullPossible ]]; then
         pull  && \
         git checkout "${branchToReturn}"  && \
         git merge --no-ff --no-edit ${branch}
@@ -27,4 +27,10 @@ function merge()
 function pull()
 {
     sg_exec "git pull --rebase"
+}
+
+function push()
+{
+    branch=$(getCurrentBranch)
+    sg_exec "git push origin ${branch}"
 }

@@ -2,7 +2,7 @@
 
 
 
-_valid_cmd=('pull' 'merge')
+_valid_cmd=('pull' 'merge', 'push')
 
 
 # @todo : check encoding for every committed file
