@@ -11,3 +11,6 @@ Install
 ln -s /\<pathTo\>/sgit.sh /home/\<user\>/bin/sgit
 
 sh .profile or logout/login
+
+
+maj
